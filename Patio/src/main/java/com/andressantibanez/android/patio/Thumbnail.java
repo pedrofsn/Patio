@@ -5,6 +5,7 @@ import android.widget.ImageView;
 public class Thumbnail {
 
     private String path;
+    private boolean selected;
     private ImageView imageView;
 
     public Thumbnail(String path, ImageView imageView) {
@@ -21,6 +22,7 @@ public class Thumbnail {
     }
 
     public void setSelected(boolean selected) {
+        this.selected = selected;
         getImageView().setSelected(selected);
         if (selected) {
             getImageView().setAlpha(0.5f);
@@ -30,6 +32,14 @@ public class Thumbnail {
     }
 
     public boolean isSelected() {
-        return getImageView().isSelected();
+        return selected;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
     }
 }
