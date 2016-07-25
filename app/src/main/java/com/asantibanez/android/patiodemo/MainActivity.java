@@ -3,14 +3,12 @@ package com.asantibanez.android.patiodemo;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.andressantibanez.android.patio.Patio;
+import com.andressantibanez.android.patio.PatioCallbacks;
 
 
-public class MainActivity extends Activity implements Patio.PatioCallbacks {
+public class MainActivity extends Activity implements PatioCallbacks {
 
     public static final int REQUEST_CODE_TAKE_PICTURE = 1000;
     public static final int REQUEST_CODE_ATTACH_PICTURE = 2000;
@@ -39,10 +37,10 @@ public class MainActivity extends Activity implements Patio.PatioCallbacks {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_ATTACH_PICTURE) {
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_ATTACH_PICTURE) {
             mPatio.handleAttachPictureResult(data);
         }
-        if(resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_TAKE_PICTURE) {
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_TAKE_PICTURE) {
             mPatio.handleTakePictureResult(data);
         }
     }

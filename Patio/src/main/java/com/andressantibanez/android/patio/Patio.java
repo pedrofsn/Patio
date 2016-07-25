@@ -30,21 +30,17 @@ import java.util.ArrayList;
 
 public class Patio extends LinearLayout implements View.OnClickListener {
 
-    /**
-     * Constants
-     */
+    // Constants
     public final static String TAG = Patio.class.getSimpleName();
     public final static int DEFAULT_MAX_PICTURES = 3;
 
-    /**
-     * Variables
-     */
+    // Variables
     private final int WIDGET_LAYOUT_RES_ID = R.layout.patio_layout;
     private final int THUMBNAIL_LAYOUT_RES_ID = R.layout.patio_thumbnail;
     private Context mContext;
     private int mMaxPictures;
     private PatioCallbacks mListener;
-    private ArrayList<PatioThumbnail> mPatioThumbnails;
+    private ArrayList<Thumbnail> mThumbnails;
     private String mTakePicturePath;
 
     //Resources
@@ -52,27 +48,23 @@ public class Patio extends LinearLayout implements View.OnClickListener {
     private float mThumbnailHeight;
     private String mThumbnailsMessageString;
 
-    /**
-     * Controls
-     */
     //Actions
     public Button mTakePicture;
     public Button mAttachPicture;
     public Button mRemovePicture;
     public Button mCancel;
+
     //Containers
     public HorizontalScrollView mThumbnailsWrapper;
     public LinearLayout mThumbnailsContainer;
     public TextView mThumbnailsCount;
+
     //Toolbars
     public LinearLayout mToolbarAddActions;
     public LinearLayout mToolbarRemoveActions;
 
     //TODO: http://ryanharter.com/blog/2014/08/29/building-dynamic-custom-views/
 
-    /**
-     * Constructor
-     */
     public Patio(Context context) {
         super(context);
         init(context, null);
@@ -126,7 +118,7 @@ public class Patio extends LinearLayout implements View.OnClickListener {
         mThumbnailHeight = mContext.getResources().getDimension(R.dimen.patio_default_thumbnail_height);
         mThumbnailWidth = mContext.getResources().getDimension(R.dimen.patio_default_thumbnail_width);
         mThumbnailsMessageString = mContext.getResources().getString(R.string.patio_thumbnails_message);
-        mPatioThumbnails = new ArrayList<PatioThumbnail>();
+        mThumbnails = new ArrayList<Thumbnail>();
         setOrientation(VERTICAL);
 
         //Local defaults
@@ -153,7 +145,7 @@ public class Patio extends LinearLayout implements View.OnClickListener {
         mToolbarRemoveActions.setVisibility(View.GONE);
 
         //Set actions listeners
-        if(!isInEditMode()) {
+        if (!isInEditMode()) {
             mTakePicture.setOnClickListener(this);
             mAttachPicture.setOnClickListener(this);
             mRemovePicture.setOnClickListener(this);
@@ -161,7 +153,7 @@ public class Patio extends LinearLayout implements View.OnClickListener {
         }
 
         //Get defined attributes
-        if(attributeSet != null) {
+        if (attributeSet != null) {
             TypedArray a = mContext.getTheme().obtainStyledAttributes(attributeSet, R.styleable.Patio, 0, 0);
             try {
                 //Runtime
@@ -179,12 +171,12 @@ public class Patio extends LinearLayout implements View.OnClickListener {
         }
 
         //Check Max Pictures
-        if(mMaxPictures <= 0) {
+        if (mMaxPictures <= 0) {
             mMaxPictures = DEFAULT_MAX_PICTURES;
         }
 
         //Check Thumbnail Message
-        if(mThumbnailsMessageString == null) {
+        if (mThumbnailsMessageString == null) {
             mThumbnailsMessageString = mContext.getResources().getString(R.string.patio_thumbnails_message);
         }
 
@@ -213,7 +205,7 @@ public class Patio extends LinearLayout implements View.OnClickListener {
     }
 
     public void restoreState(ArrayList<String> thumbnailsPaths, String takePicturePath) {
-        for(String thumbnailPath : thumbnailsPaths) {
+        for (String thumbnailPath : thumbnailsPaths) {
             addThumbnail(thumbnailPath);
         }
         mTakePicturePath = takePicturePath;
@@ -239,19 +231,19 @@ public class Patio extends LinearLayout implements View.OnClickListener {
         imageView.setOnClickListener(this);
 
 
-        mPatioThumbnails.add(new PatioThumbnail(thumbnailPath, imageView));
+        mThumbnails.add(new Thumbnail(thumbnailPath, imageView));
         showOrHideThumbnails();
         updateThumbnailsMessage();
     }
 
     public void updateThumbnailsMessage() {
-        int count = mPatioThumbnails.size();
+        int count = mThumbnails.size();
         Resources res = mContext.getResources();
         String thumbnailsCountMessage = String.format(mThumbnailsMessageString, count, mMaxPictures);
         mThumbnailsCount.setText(thumbnailsCountMessage);
 
         //Check actions button if max pictures reached
-        boolean actionsEnabled = mPatioThumbnails.size() < mMaxPictures;
+        boolean actionsEnabled = mThumbnails.size() < mMaxPictures;
         mTakePicture.setEnabled(actionsEnabled);
         mAttachPicture.setEnabled(actionsEnabled);
     }
@@ -269,7 +261,7 @@ public class Patio extends LinearLayout implements View.OnClickListener {
             ex.printStackTrace();
         }
 
-        if(pictureFile == null)
+        if (pictureFile == null)
             return null;
 
         mTakePicturePath = pictureFile.getAbsolutePath();
@@ -302,7 +294,7 @@ public class Patio extends LinearLayout implements View.OnClickListener {
     }
 
     public void showAddToolbar() {
-        if(mToolbarAddActions.getVisibility() == View.VISIBLE)
+        if (mToolbarAddActions.getVisibility() == View.VISIBLE)
             return;
 
         new SlideOutAnimation(mToolbarRemoveActions).setDirection(Animation.DIRECTION_UP).animate();
@@ -310,7 +302,7 @@ public class Patio extends LinearLayout implements View.OnClickListener {
     }
 
     public void showRemoveToolbar() {
-        if(mToolbarRemoveActions.getVisibility() == View.VISIBLE)
+        if (mToolbarRemoveActions.getVisibility() == View.VISIBLE)
             return;
 
         new SlideOutAnimation(mToolbarAddActions).setDirection(Animation.DIRECTION_UP).animate();
@@ -318,18 +310,18 @@ public class Patio extends LinearLayout implements View.OnClickListener {
     }
 
     public void cancelThumbnailSelection() {
-        for(PatioThumbnail patioThumbnail : mPatioThumbnails) {
-            patioThumbnail.setSelected(false);
+        for (Thumbnail thumbnail : mThumbnails) {
+            thumbnail.setSelected(false);
         }
         checkToolbarsStatus();
     }
 
     public void removeSelectedThumbnails() {
-        for(int i = mPatioThumbnails.size() - 1; i >= 0; i--) {
-            if(mPatioThumbnails.get(i).isSelected()) {
-                ImageView thumbnailView = mPatioThumbnails.get(i).getThumbnailView();
+        for (int i = mThumbnails.size() - 1; i >= 0; i--) {
+            if (mThumbnails.get(i).isSelected()) {
+                ImageView thumbnailView = mThumbnails.get(i).getImageView();
                 mThumbnailsContainer.removeView(thumbnailView);
-                mPatioThumbnails.remove(i);
+                mThumbnails.remove(i);
             }
         }
         updateThumbnailsMessage();
@@ -338,8 +330,8 @@ public class Patio extends LinearLayout implements View.OnClickListener {
     }
 
     private void showOrHideThumbnails() {
-        Log.d(TAG, "Quantidade de Thumbnails: " + mPatioThumbnails.size());
-        if(mPatioThumbnails.size() > 0){
+        Log.d(TAG, "Size of thumbnails: " + mThumbnails.size());
+        if (mThumbnails.size() > 0) {
             mThumbnailsWrapper.setVisibility(View.VISIBLE);
         } else {
             mThumbnailsWrapper.setVisibility(View.GONE);
@@ -348,14 +340,14 @@ public class Patio extends LinearLayout implements View.OnClickListener {
 
     public void checkToolbarsStatus() {
         boolean thumbnailsSelected = false;
-        for(PatioThumbnail patioThumbnail : mPatioThumbnails) {
-            if (patioThumbnail.getThumbnailView().getAlpha() == 0.5f) {
+        for (Thumbnail thumbnail : mThumbnails) {
+            if (thumbnail.getImageView().getAlpha() == 0.5f) {
                 thumbnailsSelected = true;
                 break;
             }
         }
 
-        if(thumbnailsSelected)
+        if (thumbnailsSelected)
             showRemoveToolbar();
         else
             showAddToolbar();
@@ -363,8 +355,8 @@ public class Patio extends LinearLayout implements View.OnClickListener {
 
     public ArrayList<String> getThumbnailsPaths() {
         ArrayList<String> thumbnailsPaths = new ArrayList<String>();
-        for(PatioThumbnail patioThumbnail : mPatioThumbnails) {
-            thumbnailsPaths.add(patioThumbnail.getThumbnailPath());
+        for (Thumbnail thumbnail : mThumbnails) {
+            thumbnailsPaths.add(thumbnail.getPath());
         }
         return thumbnailsPaths;
     }
@@ -375,41 +367,33 @@ public class Patio extends LinearLayout implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         //Buttons
-        if(view instanceof Button) {
-            if(view.getId() == R.id.patio_action_take_picture) {
+        if (view instanceof Button) {
+            if (view.getId() == R.id.patio_action_take_picture) {
                 mListener.onTakePictureClick();
             }
-            if(view.getId() == R.id.patio_action_attach_picture) {
+            if (view.getId() == R.id.patio_action_attach_picture) {
                 mListener.onAddPictureClick();
             }
-            if(view.getId() == R.id.patio_action_remove_picture) {
+            if (view.getId() == R.id.patio_action_remove_picture) {
                 removeSelectedThumbnails();
             }
-            if(view.getId() == R.id.patio_action_cancel) {
+            if (view.getId() == R.id.patio_action_cancel) {
                 cancelThumbnailSelection();
             }
         }
 
         //Thumbnails
-        if(view instanceof ImageView) {
-            //Check for PatioThumbnail
-            for(PatioThumbnail patioThumbnail : mPatioThumbnails) {
+        if (view instanceof ImageView) {
+            //Check for Thumbnail
+            for (Thumbnail thumbnail : mThumbnails) {
                 //Inverse selection for selected thumbnail
-                if(patioThumbnail.getThumbnailView().equals(view)) {
-                    patioThumbnail.setSelected(!patioThumbnail.isSelected());
+                if (thumbnail.getImageView().equals(view)) {
+                    thumbnail.setSelected(!thumbnail.isSelected());
                     break;
                 }
             }
             checkToolbarsStatus();
         }
-    }
-
-    /**
-     * Interface
-     */
-    public interface PatioCallbacks {
-        public void onTakePictureClick();
-        public void onAddPictureClick();
     }
 
     /**
@@ -440,6 +424,7 @@ public class Patio extends LinearLayout implements View.OnClickListener {
             public SavedState createFromParcel(Parcel in) {
                 return new SavedState(in);
             }
+
             public SavedState[] newArray(int size) {
                 return new SavedState[size];
             }
@@ -448,6 +433,7 @@ public class Patio extends LinearLayout implements View.OnClickListener {
         public void setThumbnailsPaths(ArrayList<String> thumbnailsPaths) {
             mThumbnailsPaths = thumbnailsPaths;
         }
+
         public ArrayList<String> getThumbnailsPaths() {
             return mThumbnailsPaths;
         }
